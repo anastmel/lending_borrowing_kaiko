@@ -9,7 +9,7 @@ Created on Thu Apr 20 14:06:47 2023
 import pandas as pd
 import requests
 
-## GET KAIKO LENDING AND BORROWING RATES & LIQUIDITY DATA 
+
 def kaiko_lb_markets(apikey, protocols, assets, interval, quote_assets=None, blockchain=None, start_time=None, end_time=None, block_number=None, start_block=None, end_block=None):
     '''
     Parameters
@@ -53,6 +53,7 @@ def kaiko_lb_markets(apikey, protocols, assets, interval, quote_assets=None, blo
     final_data = flatten_metadata(final_df)
     final_data['date'] = pd.to_datetime(final_data['datetime'], unit='s').dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
     final_data['asset_symbol'] = final_data['asset_symbol'].str.lower()
+    final_data = final_data.drop_duplicates()
 
     if quote_assets is not None:    
         ########################################################################################################################################################################################
@@ -119,13 +120,13 @@ def kaiko_lb_markets(apikey, protocols, assets, interval, quote_assets=None, blo
             for word in words_to_drop:
                 if word in col:
                     merged_df.drop(col, axis=1, inplace=True)
-        merged_df.drop('date_y', axis=1, inplace=True)
+        merged_df.drop('date_x', axis=1, inplace=True)
         merged_df.drop('timestamp', axis=1, inplace=True)
-        merged_df.rename(columns={'date_x': 'date'}, inplace=True)
+        merged_df.rename(columns={'date_y': 'date'}, inplace=True)
         merged_df['pair'] = merged_df['base'] + '-' + merged_df['quote']
         merged_df.drop(['base', 'quote'], axis=1, inplace=True)
         suffix = 'usd_'
-        columns_to_convert = ['available_liquidity', 'total_borrowed', 'total_liquidity','metadata.total_borrowed_stable', 'metadata.total_borrowed_variable','metadata.total_reserves','metadata.debt_ceiling']
+        columns_to_convert = ['available_liquidity', 'total_borrowed', 'total_liquidity','metadata.total_borrowed_stable', 'metadata.total_borrowed_variable','metadata.total_reserves','metadata.debt_ceiling','metadata.debt_floor']
         for col in columns_to_convert:
             try:
                 merged_df[suffix+col] = merged_df[col].astype(float) * merged_df['price'].astype(float)
