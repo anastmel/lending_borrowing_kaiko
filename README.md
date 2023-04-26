@@ -25,6 +25,6 @@ apikey = 'your_kaiko_api_key_here'
 quote_assets = ['usd']
 interval = '1d'
 
-df = kk.kaiko_lb(apikey, start_time=start_time, end_time=end_time, protocols=protocols, assets=assets,  quote_assets=quote_assets, interval=interval)
+df = kk.kaiko_lb_markets(apikey, start_time=start_time, end_time=end_time, protocols=protocols, assets=assets,  quote_assets=quote_assets, interval=interval)
 df.to_csv('lb_markets.csv')
 ```
